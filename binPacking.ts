@@ -44,8 +44,7 @@ export default class BinPacking{
     generateRandomSolution(): void{
         this.bins = [];
         let rest = [...this.items];
-        rest.sort((a,b)=> b.height - a.height)
-        console.log(rest);
+        rest.sort((a,b)=> b.area - a.area)
         while(rest.length > 0){
             const bin = new Bin(this.binWidth, this.binHeight);
             this.bins.push(bin);
@@ -55,5 +54,10 @@ export default class BinPacking{
 
     getBins(): Array<Bin>{
         return this.bins;
+    }
+
+    
+    generateNeighbor(){
+        
     }
 }
