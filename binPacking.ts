@@ -1,4 +1,5 @@
 import Item from "./Item";
+import Bin from "./bin";
 
 export default class BinPacking{
 
@@ -13,6 +14,8 @@ export default class BinPacking{
     private binHeight: number;
 
     private items: Array<Item>;
+
+    private bins: Array<Bin> = [];
     
     constructor(name: string, comment: string, nbItems: number, binWidth: number, binHeight: number, items: Array<Item>) {
         this.name = name;
@@ -30,15 +33,27 @@ export default class BinPacking{
         return new BinPacking(name, comment, +nbItems, +binWidth, +binHeight,items);
     }
 
-    get area(): number{
-        return this.binWidth * this.binHeight;
-    }
-
     /**
      * Get the minimum number of bins needed to store all items
      * @returns the minimum number of bins needed
      */
     getMinBinAmount(): number{
-        return Math.ceil(this.items.reduce((acc, item) => acc + item.area, 0)/this.area);
+        return Math.ceil(this.items.reduce((acc, item) => acc + item.area, 0)/(this.binWidth * this.binHeight));
+    }
+
+    generateRandomSolution(): void{
+        this.bins = [];
+        let rest = [...this.items];
+        rest.sort((a,b)=> b.height - a.height)
+        console.log(rest);
+        while(rest.length > 0){
+            const bin = new Bin(this.binWidth, this.binHeight);
+            this.bins.push(bin);
+            rest = rest.filter(item => !bin.addItem(item));
+        }
+    }
+
+    getBins(): Array<Bin>{
+        return this.bins;
     }
 }

@@ -1,23 +1,16 @@
-export default class Item{
-    
-        private id: number;
-    
-        private width: number;
-    
-        private height: number;
-    
-        constructor(id: number, width: number, height: number) {
-            this.id = id;
-            this.width = width;
-            this.height = height;
-        }
+import Rectangle from "./rectangle";
 
-        static fromString(str: string): Item{
-            const [id, width, height] = str.split(" ").map(Number);
-            return new Item(id, width, height);
-        }
+export default class Item extends Rectangle{
 
-        get area(): number{
-            return this.width * this.height;
-        }
+    private id: number;
+
+    constructor(id: number, width: number, height: number) {
+        super(width,height);
+        this.id = id;
     }
+
+    static fromString(str: string): Item{
+        const [id, width, height] = str.split(" ").map(Number);
+        return new Item(id, width, height);
+    }
+}
