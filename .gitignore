@@ -132,4 +132,7 @@ dist
 # output directory
 output/*
 
+# build directory
+build/*
+
 # Ignore 

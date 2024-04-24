@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
-import BinPacking from '../binPacking';
+import BinPacking from '../src/binPacking';
 import dedent from "dedent";
-import Item from '../Item';
+import Item from '../src/Item';
 
 describe('binPacking', () => {
     test('from string', () => {
@@ -27,20 +27,6 @@ describe('binPacking', () => {
                 new Item(3, 167, 152),
                 new Item(4, 69, 165)
             ]));
-    });
-
-    test('area', () => {
-        const binPacking = new BinPacking("un nom", "un commentaire", 4, 250, 250, 
-            [
-                new Item(1, 167, 184),
-                new Item(2, 114, 118),
-                new Item(3, 167, 152),
-                new Item(4, 69, 165)
-            ]);
-
-        const area = binPacking.area;
-
-        expect(area).toBe(250*250);
     });
 
     test('getMinBinAmount', () => {

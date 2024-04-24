@@ -55,9 +55,40 @@ export default class BinPacking{
     getBins(): Array<Bin>{
         return this.bins;
     }
-
     
-    generateNeighbor(){
-        
+    generateNeighbor():Array<Array<Bin>>{
+        const neightbor = []
+
+        for(let binIndiceSource = 0; binIndiceSource < this.bins.length; binIndiceSource++){
+            for(let binIndiceOutput = 0; binIndiceOutput < this.bins.length; binIndiceOutput++){
+                if(binIndiceSource == binIndiceOutput) continue;
+                const items = this.bins[binIndiceSource].getItems();
+                for(let itemIndice = 0; itemIndice < items.length; itemIndice++){
+                    const bins = [];
+                    let valid = false;
+                    
+                    
+                    for(let k = 0; k < this.bins.length; k++){
+                        if(k == binIndiceSource){
+                            const bin = new Bin(this.bins[k].width, this.bins[k].height);
+                            for(let i = 0; i < this.bins[k].getItems().length; i++){
+                                if(i != itemIndice)bin.addItem(this.bins[k].getItems()[i].copy());
+                            }
+                            bins.push(bin);
+                        }
+                        else bins.push(this.bins[k].copy());
+                    }
+                    bins[binIndiceSource].removeItem(items[itemIndice]);
+                    const copy = items[itemIndice].copy()
+                    copy.rotate()
+                    valid = bins[binIndiceOutput].addItem(copy) || false;
+
+                    if(valid){
+                        neightbor.push(bins);
+                    }
+                }
+            }
+        }
+        return neightbor;
     }
 }
