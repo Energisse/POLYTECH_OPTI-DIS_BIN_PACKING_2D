@@ -12,11 +12,6 @@ export default class Item extends Rectangle{
         this.color = color || `#${Math.floor(Math.random()*16777215).toString(16)}`;
     }
 
-    static fromString(str: string): Item{
-        const [id, width, height] = str.split(" ").map(Number);
-        return new Item(id, width, height);
-    }
-
     rotate(): void{
         [this.width, this.height] = [this.height, this.width];
     }

@@ -25,7 +25,7 @@ export default class Bin extends Rectangle{
      * @param item the item to add
      */
     addItem(item:Item): boolean{
-        if(item.width > this.width || item.height > this.height) return false;
+            if(item.width > this.width || item.height > this.height) return false;
         if(item.area > this.area - (this.item?.area || 0)) return false;
 
         if(this.item == null){
@@ -42,18 +42,32 @@ export default class Bin extends Rectangle{
         if(this.rightSubBin.addItem(item)) return true;
         if(this.bottomSubBin.addItem(item)) return true;
 
-        if(!this.rightSubBin || this.rightSubBin.isEmtpy() ){
-            let newBottomBin = new Bin(this.width, this.height-this.item.height, this.x, this.y+this.item.height);
-            for(const item of this.bottomSubBin.getItems()){
-                if(!newBottomBin.addItem(item)){
+
+        function getDeepestY(bin: Bin): number{
+            let max = bin.y + (bin.getItem()?.height || 0);
+            for(const subBin of bin.getSubBins()){
+                max = Math.max(max, getDeepestY(subBin));
+            }
+            return max;
+        }
+
+        const newHeight = Math.max(this.item.height, getDeepestY(this.rightSubBin));
+        const newBottomBin = new Bin(this.width, this.height-newHeight, this.x, this.y+newHeight);
+        for(const item of this.bottomSubBin.getItems()){
+            if(!newBottomBin.addItem(item)){
+                return false;
+            }
+        }
+        if(newBottomBin.addItem(item)){
+            const newRightBin = new Bin(this.width-this.item.width, newHeight, this.x+this.item.width, this.y);
+            for(const item of  this.rightSubBin.getItems()){
+                if(!newRightBin.addItem(item)){
                     return false;
                 }
             }
-            if(newBottomBin.addItem(item)){
-                this.bottomSubBin = newBottomBin;
-                this.rightSubBin = new Bin(this.width-this.item.width, this.item.height, this.x+this.item.width, this.y);
-                return true;
-            }
+            this.bottomSubBin = newBottomBin;
+            this.rightSubBin = newRightBin;
+            return true;
         }
 
         return false;
