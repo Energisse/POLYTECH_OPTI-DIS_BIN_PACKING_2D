@@ -37,7 +37,7 @@ export default class Genetique {
     computeFitness(): void {
         const fitness = this.generation.map(individual => ({
             individual,
-            fitness: individual.getBins().reduce((acc, bin) => acc + Math.pow(bin.getItems().reduce((acc, item) => acc + item.area, 0), 2), 0)
+            fitness: individual.getFitness()
         }));
 
         fitness.sort((a, b) => b.fitness - a.fitness);

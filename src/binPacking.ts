@@ -72,4 +72,8 @@ export default class BinPacking{
     getHeight(): number{
         return this.binHeight;
     }
+
+    getFitness(): number{
+        return this.bins.reduce((acc, bin) => acc + Math.pow(bin.getItems().reduce((acc, item) => acc + item.area, 0), 2), 0);
+    }
 }

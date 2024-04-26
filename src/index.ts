@@ -3,6 +3,7 @@ import DataSet from './dataSet';
 import Genetique from './genetique';
 import BinPacking from './binPacking';
 import Draw from './draw';
+import tabou from './tabou';
 const binPackingFolder:string = "./binpacking2d/";
 
 const workers = new Set<Worker>();
@@ -37,25 +38,27 @@ const workers = new Set<Worker>();
 
     // console.log(data.map(item => item.getId()));
 
+    await new tabou(dataSet[11]).run();
+
     // Draw.drawBinPackingToFiles(new BinPacking(dataSet[0].binWidth, dataSet[0].binHeight, data), './output');
-    await fs.mkdir(`./output/`).catch(()=>{});
-    const data = dataSet[11]
-    // for(const data of dataSet){
-        await fs.mkdir(`./output/${data.name}`).catch(()=>{});
-        const genetique = new Genetique(data)
-        genetique.generatePopulation();
-        await fs.mkdir(`./output/${data.name}/INIT/`).catch(()=>{});
-        await genetique.draw(`./output/${data.name}/INIT/`);
-        for(let i = 0; i <= 100_000; i++){
-            genetique.computeFitness();
-            genetique.crossover();
-            genetique.mutate();
-            console.log("Generation: " + i);
-            if(i%10000 == 0){
-                await fs.mkdir(`./output/${data.name}/gen${i}`).catch(()=>{});
-                await genetique.draw(`./output/${data.name}/gen${i}`);
-            }
-            }
+    // await fs.mkdir(`./output/`).catch(()=>{});
+    // const data = dataSet[11]
+    // // for(const data of dataSet){
+    //     await fs.mkdir(`./output/${data.name}`).catch(()=>{});
+    //     const genetique = new Genetique(data)
+    //     genetique.generatePopulation();
+    //     await fs.mkdir(`./output/${data.name}/INIT/`).catch(()=>{});
+    //     await genetique.draw(`./output/${data.name}/INIT/`);
+    //     for(let i = 0; i <= 100_000; i++){
+    //         genetique.computeFitness();
+    //         genetique.crossover();
+    //         genetique.mutate();
+    //         console.log("Generation: " + i);
+    //         if(i%10000 == 0){
+    //             await fs.mkdir(`./output/${data.name}/gen${i}`).catch(()=>{});
+    //             await genetique.draw(`./output/${data.name}/gen${i}`);
+    //         }
+    //     }
     // }
 
     // binPacking.generateRandomSolution();
