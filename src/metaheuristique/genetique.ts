@@ -1,28 +1,31 @@
-import BinPacking from "./binPacking";
-import DataSet from "./dataSet";
-import Draw from "./draw";
+import BinPacking from "../binPacking";
+import DataSet from "../dataSet";
+import Draw from "../draw";
+import Metaheuristique from "./metaheuristique";
 
 /**
  * Represents a genetic algorithm for bin packing optimization.
  */
-export default class Genetique {
+class Genetique extends Metaheuristique {
+
     private generation: Array<BinPacking> = [];
     private newGeneration: Array<BinPacking> = [];
     private populationSize: number = 20;
-    private dataSet: DataSet;
+    private iteration: number;
 
     /**
      * Creates a new instance of the Genetique class.
      * @param dataSet The dataset used for bin packing.
      */
-    constructor(dataSet: DataSet) {
-        this.dataSet = dataSet;
+    constructor(dataSet: DataSet, iteration?: number) {
+        super(dataSet);
+        this.iteration = iteration || dataSet.items.length**2;
     }
 
     /**
      * Generates the initial population of solutions.
      */
-    generatePopulation(): void {
+    private generatePopulation(): void {
         for (let i = 0; i < this.populationSize; i++) {
             this.generation.push(this.dataSet.createRandomSolution());
         }
@@ -34,7 +37,7 @@ export default class Genetique {
      * The higher the fitness, the more filled a bin is.
      * The more evenly the used space is distributed, the lower the fitness.
      */
-    computeFitness(): void {
+    private computeFitness(): void {
         const fitness = this.generation.map(individual => ({
             individual,
             fitness: individual.getFitness()
@@ -47,7 +50,7 @@ export default class Genetique {
     /**
      * Performs crossover between individuals in the population to create a new generation.
      */
-    crossover(): void {
+    private crossover(): void {
         this.newGeneration = [this.generation[0]];
         for (let i = 1; i < (this.populationSize - 1) / 2; i++) {
             const parent1 = this.generation[i - 1];
@@ -73,7 +76,7 @@ export default class Genetique {
      * Performs mutation on the new generation of individuals.
      * Mutation randomly modifies the order of items in each individual.
      */
-    mutate(): void {
+    private mutate(): void {
         for (let i = 1; i < this.newGeneration.length; i++) {
             const items = this.newGeneration[i].getItems();
             for (let index = 0; index < items.length; index++) {
@@ -94,6 +97,17 @@ export default class Genetique {
         this.generation = this.newGeneration;
     }
 
+    public run(): void {
+        this.generatePopulation();
+        for (let i = 1; i <= this.iteration; i++) {
+            this.crossover();
+            this.mutate();
+            this.computeFitness();
+            this.emit('newSolution', this.generation, i);
+        }
+        this.emit('bestSolution', this.generation[0]);
+    }
+
     /**
      * Draws the bin packing solutions in the population to image files.
      * @param path The path where the image files will be saved.
@@ -112,3 +126,5 @@ export default class Genetique {
         return this.generation;
     }
 }
+
+export default Genetique;

@@ -1,47 +1,47 @@
-import fs from 'fs';
-import DataSet from './dataSet';
-import BinPacking from './binPacking';
-import Draw from './draw';
+import DataSet from '../dataSet';
+import BinPacking from '../binPacking';
+import Metaheuristique from './metaheuristique';
 
-export default class Tabu {
-    private tabu: Array<{ src: number; dest: number }> = [];
-    private tabuSize: number = 50;
-    private dataSet: DataSet;
+class Tabou extends Metaheuristique{
+    private tabou: Array<{ src: number; dest: number }> = [];
+    private tabouSize: number;
+    private iteration: number;
     private solution: BinPacking;
 
     /**
      * Creates an instance of Tabu.
      * @param {DataSet} dataSet - The data set for the problem.
      */
-    constructor(dataSet: DataSet) {
-        this.dataSet = dataSet;
+    constructor(dataSet: DataSet,iteration?:number,tabouSize?:number) {
+        super(dataSet);
         this.solution = this.dataSet.createRandomSolution();
+        this.tabou = [];
+        this.iteration = iteration || dataSet.items.length**2;
+        this.tabouSize = tabouSize || dataSet.items.length/2;
     }
 
     /**
      * Runs the Tabu algorithm.
-     * @returns {Promise<void>}
+     * @returns {void}
      */
-    public async run(): Promise<void> {
+    public run(): void {
         let bestFitness = this.solution.getFitness();
-        await fs.promises.mkdir('./output/tabou/').catch(() => {});
-        await Draw.drawBinPackingToFiles(this.solution, './output/tabou/init');
 
-        for (let i = 0; i < 300; i++) {
+        for (let i = 1; i <= this.iteration; i++) {
             const neighbor = this.getBestNeighbors();
 
             if (neighbor.fitness <= bestFitness) {
-                this.tabu.push({ src: neighbor.src, dest: neighbor.dest });
-                if (this.tabu.length > this.tabuSize) {
-                    this.tabu.shift();
+                this.tabou.push({ src: neighbor.src, dest: neighbor.dest });
+                if (this.tabou.length > this.tabouSize) {
+                    this.tabou.shift();
                 }
             }
 
             this.solution = neighbor.solution;
             bestFitness = neighbor.fitness;
-
-            await Draw.drawBinPackingToFiles(this.solution, `./output/tabou/${i}`);
+            this.emit('newSolution',[this.solution],i);
         }
+        this.emit('bestSolution',this.solution);
     }
 
     /**
@@ -66,7 +66,7 @@ export default class Tabu {
                 if (i === j) {
                     continue;
                 }
-                if (this.tabu.some(tabu => tabu.src === i && tabu.dest === j)) continue;
+                if (this.tabou.some(tabu => tabu.src === i && tabu.dest === j)) continue;
 
                 const neighborItems = items.map(item => item.copy());
                 neighborItems[i].rotate();
@@ -90,3 +90,5 @@ export default class Tabu {
         };
     }
 }
+
+export default Tabou;
