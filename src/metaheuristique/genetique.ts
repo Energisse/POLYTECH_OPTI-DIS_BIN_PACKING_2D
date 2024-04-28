@@ -108,15 +108,6 @@ class Genetique extends Metaheuristique {
         this.emit('bestSolution', this.generation[0]);
     }
 
-    /**
-     * Draws the bin packing solutions in the population to image files.
-     * @param path The path where the image files will be saved.
-     */
-    async draw(path: string): Promise<void> {
-        for (let i = 0; i < this.populationSize; i++) {
-            await Draw.drawBinPackingToFiles(this.generation[i], path + "/pop" + i);
-        }
-    }
 
     /**
      * Gets the current population of bin packing solutions.
