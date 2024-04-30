@@ -10,19 +10,19 @@ export default class Draw{
 
     static drawBinPackingToFilesSync(binPacking: BinPacking,name:string):void{
         for(let i = 0; i < binPacking.getBins().length; i++){
-            this.writeFileRecursiveSync(name+"/bin"+i+".png", this.drawBin(binPacking.getBins()[i]));
+            this.writeFileRecursiveSync(name+"/bin"+i+".svg", this.drawBin(binPacking.getBins()[i]));
         };
     }
 
     static async drawBinPackingToFiles(binPacking: BinPacking,name:string):Promise<void>{
         for(let i = 0; i < binPacking.getBins().length; i++){
-            await this.writeFileRecursive(name+"/bin"+i+".png", this.drawBin(binPacking.getBins()[i]));
+            await this.writeFileRecursive(name+"/bin"+i+".svg", this.drawBin(binPacking.getBins()[i]));
         };
     }
 
 
     private static drawBin(bin: Bin){
-        const canvas = createCanvas(bin.width, bin.height)
+        const canvas = createCanvas(bin.width, bin.height,'svg')
         const ctx = canvas.getContext('2d');
         function drawRec(bin: Bin){
             ctx.strokeStyle = `red`;
