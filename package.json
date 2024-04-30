@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "canvas": "^2.11.2",
+    "chalk": "^4.1.2",
     "p-queue": "^6.6.2",
     "path": "^0.12.7",
     "tiny-typed-emitter": "^2.1.0"

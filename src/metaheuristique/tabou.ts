@@ -2,6 +2,19 @@ import DataSet from '../dataSet';
 import BinPacking from '../binPacking';
 import Metaheuristique from './metaheuristique';
 
+export interface TabouConfig{
+    /**
+     * The number of iterations for the Tabou algorithm.
+     * @default dataSet.items.length**2
+     */
+    iteration?: number;
+    /**
+     * The size of the tabou list.
+     * @default dataSet.items.length/2
+     */
+    tabouSize?:number
+}
+
 class Tabou extends Metaheuristique{
     private tabou: Array<{ src: number; dest: number }> = [];
     private tabouSize: number;
@@ -12,12 +25,12 @@ class Tabou extends Metaheuristique{
      * Creates an instance of Tabu.
      * @param {DataSet} dataSet - The data set for the problem.
      */
-    constructor(dataSet: DataSet,iteration?:number,tabouSize?:number) {
+    constructor(dataSet: DataSet,config?:TabouConfig) {
         super(dataSet);
         this.solution = this.dataSet.createRandomSolution();
         this.tabou = [];
-        this.iteration = iteration || dataSet.items.length**2;
-        this.tabouSize = tabouSize || dataSet.items.length/2;
+        this.iteration = config?.iteration || dataSet.items.length**2;
+        this.tabouSize = config?.tabouSize || dataSet.items.length/2;
     }
 
     /**

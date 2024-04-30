@@ -20,7 +20,7 @@ class HillClimbing extends Metaheuristique{
      */
     public run(): void {
         let bestFitness = this.solution.getFitness();
-        let iteration = 0;
+        let iteration = 1;
         while(true) {
             const neighbor = this.getBestNeighbors();
             if (neighbor.fitness <= bestFitness) break
@@ -44,7 +44,6 @@ class HillClimbing extends Metaheuristique{
 
         let bestSolution: BinPacking | undefined;
         let bestFitness = 0;
-        console.log("ouii")
         for (let i = 0; i < items.length; i++) {
             for (let j = 0; j < items.length; j++) {
                 if (i === j) {

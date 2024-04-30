@@ -1,7 +1,15 @@
 import BinPacking from "../binPacking";
 import DataSet from "../dataSet";
-import Draw from "../draw";
 import Metaheuristique from "./metaheuristique";
+
+
+export interface GenetiqueConfig{
+    /**
+     * The number of iterations for the Genetique algorithm.
+     * @default dataSet.items.length**2
+     */
+    iteration: number;
+}
 
 /**
  * Represents a genetic algorithm for bin packing optimization.
@@ -17,9 +25,9 @@ class Genetique extends Metaheuristique {
      * Creates a new instance of the Genetique class.
      * @param dataSet The dataset used for bin packing.
      */
-    constructor(dataSet: DataSet, iteration?: number) {
+    constructor(dataSet: DataSet, config?:GenetiqueConfig) {
         super(dataSet);
-        this.iteration = iteration || dataSet.items.length**2;
+        this.iteration = config?.iteration || dataSet.items.length**2;
     }
 
     /**

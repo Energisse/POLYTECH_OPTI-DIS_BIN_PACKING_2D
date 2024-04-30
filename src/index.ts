@@ -2,10 +2,12 @@ import fs from 'fs';
 import DataSet from './dataSet';
 import { Worker } from 'worker_threads';
 import { WorkerData } from './worker';
-import Metaheuristique from './metaheuristique/metaheuristique';
 import Genetique from './metaheuristique/genetique';
 import Tabou from './metaheuristique/tabou';
 import Draw from './draw';
+import HillClimbing from './metaheuristique/hillClimbing';
+import RecruitSimule from './metaheuristique/recruitSimule';
+import chalk from 'chalk';
 const binPackingFolder:string = "./binpacking2d/";
 
 const folders = fs.readdirSync(binPackingFolder)
@@ -65,26 +67,31 @@ function waitWorkerToFinish(worker:Worker){
 })()*/
 
 try {
-    fs.rmdirSync('./output', { recursive: true })
+    fs.rmSync('./output', { recursive: true })
 }
 catch(e){
     console.log(e);
 }
-
-
+const gobalStart = performance.now();
 for(const data of dataSet){
-    const algos =  [ new Genetique(data),new Tabou(data)];
+    const startDataSet = performance.now();
+    console.log(chalk.greenBright.underline(`Starting ${data.name}`));
+    const algos =  [ new Genetique(data),new Tabou(data),new HillClimbing(data),new RecruitSimule(data)];
     for(const algo of algos){
-    
-    algo.on('newSolution', async (solution,i) => {
-            if(i%(data.nbItems**2/10) == 0 || i == 1){
-                if(algo instanceof Tabou ){
-                    Draw.drawBinPackingToFilesSync(solution[0], `./output/tabou/${data.name}/${i}`);
-                }
-                else solution.map((sol,pop)=>Draw.drawBinPackingToFilesSync(sol, `./output/genetique/${data.name}/${i}/pop${pop}`));
-            }
+        console.log(chalk.blueBright.underline(`\t${algo.constructor.name}`));
+        const start = performance.now();
+        algo.on('newSolution', (solution,i) => {
+            if(i%data.nbItems == 0 || i == 1)Draw.drawBinPackingToFilesSync(solution[0], `./output/${algo.constructor.name.toLowerCase()}/${data.name}/${i}`);
+        })  
+        algo.once('bestSolution', (solution) => {
+            console.log(chalk.greenBright(`\t${solution.getBins().length} bins fitness(${solution.getFitness().toExponential(2)})`));
+            Draw.drawBinPackingToFilesSync(solution, `./output/${algo.constructor.name.toLowerCase()}/${data.name}/best`);
         })  
     
-    algo.run();
+        algo.run();
+        algo.removeAllListeners();
+        console.log(chalk(`\tdone in ${Math.floor(performance.now() - start)}ms \n`));
     }
+    console.log(chalk.whiteBright.bgGreenBright(`${data.name} done in ${Math.floor(performance.now() - startDataSet)}ms\n`));
 }
+console.log(chalk.blue.underline(`All done in ${Math.floor(performance.now() - gobalStart)}ms`));
