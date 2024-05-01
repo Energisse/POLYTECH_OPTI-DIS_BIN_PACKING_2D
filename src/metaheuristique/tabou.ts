@@ -35,10 +35,9 @@ class Tabou extends Metaheuristique{
 
     /**
      * Runs the Tabu algorithm.
-     * @returns {void}
      */
-    public run(): void {
-        let bestFitness = this.solution.getFitness();
+    public * run() {
+        let bestFitness = this.solution.fitness;
 
         for (let i = 1; i <= this.iteration; i++) {
             const neighbor = this.getBestNeighbors();
@@ -52,9 +51,11 @@ class Tabou extends Metaheuristique{
 
             this.solution = neighbor.solution;
             bestFitness = neighbor.fitness;
-            this.emit('newSolution',[this.solution],i);
+            yield {
+                solution:[this.solution],
+                iteration: i
+            };
         }
-        this.emit('bestSolution',this.solution);
     }
 
     /**
@@ -67,7 +68,7 @@ class Tabou extends Metaheuristique{
         solution: BinPacking;
         fitness: number;
     } {
-        const items = this.solution.getItems();
+        const items = this.solution.items;
 
         let src = 0;
         let dest = 0;
@@ -86,11 +87,11 @@ class Tabou extends Metaheuristique{
                 neighborItems.splice(j, 0, neighborItems.splice(i, 1)[0]);
 
                 const solution = new BinPacking(this.dataSet.binWidth, this.dataSet.binHeight, neighborItems);
-                if (solution.getFitness() > bestFitness) {
+                if (solution.fitness > bestFitness) {
                     src = i;
                     dest = j;
                     bestSolution = solution;
-                    bestFitness = solution.getFitness();
+                    bestFitness = solution.fitness;
                 }
             }
         }

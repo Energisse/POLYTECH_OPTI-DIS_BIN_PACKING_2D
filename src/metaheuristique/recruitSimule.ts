@@ -40,7 +40,7 @@ class RecruitSimule extends Metaheuristique{
     constructor(dataSet: DataSet,config?:RecruitSimuleConfig) {
         super(dataSet);
         this.bestSolution = this.dataSet.createRandomSolution();
-        this.bestFitness = this.bestSolution.getFitness();
+        this.bestFitness = this.bestSolution.fitness;
         this.iteration = config?.iteration || dataSet.items.length;
         this.iterationByTemperature = config?.iterationByTemperature || dataSet.items.length;
         this.temperatureDecrease = config?.temperatureDecrease || 0.8;
@@ -50,10 +50,9 @@ class RecruitSimule extends Metaheuristique{
 
     /**
      * Runs the RecruitSimule algorithm.
-     * @returns {void}
      */
-    public run(): void {
-        let currentFitness = this.bestSolution.getFitness();
+    public * run() {
+        let currentFitness = this.bestSolution.fitness;
         let currentSolution = this.bestSolution;
 
         let totalIteration = 1;
@@ -61,7 +60,7 @@ class RecruitSimule extends Metaheuristique{
             for(let j = 1; j <= this.iterationByTemperature; j++){
                 const neighbor = this.getRandomNeighboor();
 
-                const fitness = neighbor.getFitness();
+                const fitness = neighbor.fitness;
 
                 if (fitness >= currentFitness) {
                     currentSolution = neighbor;
@@ -77,11 +76,14 @@ class RecruitSimule extends Metaheuristique{
                         currentSolution = neighbor;
                     }
                 }
-                this.emit('newSolution',[currentSolution],totalIteration++);   
+                totalIteration++;
+                yield {
+                    solution: [currentSolution],
+                    iteration: totalIteration
+                };
             }
             this.temperature *= this.temperatureDecrease;
         }
-        this.emit('bestSolution',this.bestSolution);
     }
 
     /**
@@ -89,7 +91,7 @@ class RecruitSimule extends Metaheuristique{
      * @returns {BinPacking} - The random neighbor.
      */
     private getRandomNeighboor(): BinPacking {
-        const items = this.bestSolution.getItems();
+        const items = this.bestSolution.items;
 
         while(true){
             const i = Math.floor(Math.random() * items.length);

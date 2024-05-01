@@ -1,21 +1,18 @@
 import BinPacking from "../binPacking";
 import DataSet from "../dataSet";
-import {  TypedEmitter }  from "tiny-typed-emitter";
 
-export interface MetaheuristiqueEvents  {
-    bestSolution: (solution: BinPacking) => void;
-    newSolution: (solution: BinPacking[] , iteration: number) => void;
-}
-
-abstract class Metaheuristique extends TypedEmitter<MetaheuristiqueEvents>   {
+abstract class Metaheuristique   {
     private _dataSet: DataSet;
 
     constructor(dataSet: DataSet){
-        super();
         this._dataSet = dataSet;
     }
 
-    public abstract run(): void;
+    public abstract run(): Generator<{
+        solution: BinPacking[];
+        iteration: number;
+    }, void, void>;
+
 
     get dataSet(): DataSet{
         return this._dataSet;

@@ -48,7 +48,7 @@ class Genetique extends Metaheuristique {
     private computeFitness(): void {
         const fitness = this.generation.map(individual => ({
             individual,
-            fitness: individual.getFitness()
+            fitness: individual.fitness
         }));
 
         fitness.sort((a, b) => b.fitness - a.fitness);
@@ -64,8 +64,8 @@ class Genetique extends Metaheuristique {
             const parent1 = this.generation[i - 1];
             const parent2 = this.generation[i];
 
-            const items1 = parent1.getItems();
-            const items2 = parent2.getItems();
+            const items1 = parent1.items;
+            const items2 = parent2.items;
 
             const index1 = Math.floor(Math.random() * items1.length);
             const index2 = Math.floor(Math.random() * items1.length);
@@ -86,7 +86,7 @@ class Genetique extends Metaheuristique {
      */
     private mutate(): void {
         for (let i = 1; i < this.newGeneration.length; i++) {
-            const items = this.newGeneration[i].getItems();
+            const items = this.newGeneration[i].items;
             for (let index = 0; index < items.length; index++) {
                 if (Math.random() > 0.1) continue;
                 const itemToMove = items.splice(index, 1)[0].copy();
@@ -105,15 +105,17 @@ class Genetique extends Metaheuristique {
         this.generation = this.newGeneration;
     }
 
-    public run(): void {
+    public * run() {
         this.generatePopulation();
         for (let i = 1; i <= this.iteration; i++) {
             this.crossover();
             this.mutate();
             this.computeFitness();
-            this.emit('newSolution', this.generation, i);
+            yield {
+                solution: this.generation,
+                iteration: i
+            };
         }
-        this.emit('bestSolution', this.generation[0]);
     }
 
 

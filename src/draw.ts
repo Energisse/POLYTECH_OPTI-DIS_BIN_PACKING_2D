@@ -8,37 +8,37 @@ export default class Draw{
 
     private constructor(){}
 
-    static drawBinPackingToFilesSync(binPacking: BinPacking,name:string):void{
-        for(let i = 0; i < binPacking.getBins().length; i++){
-            this.writeFileRecursiveSync(name+"/bin"+i+".svg", this.drawBin(binPacking.getBins()[i]));
+    static drawBinPackingToFilesSync(binPacking: BinPacking,name:string,type: 'pdf'|'svg' = "svg"):void{
+        for(let i = 0; i < binPacking.bins.length; i++){
+            this.writeFileRecursiveSync(name+"/bin"+i+".svg", this.drawBin(binPacking.bins[i],type));
         };
     }
 
-    static async drawBinPackingToFiles(binPacking: BinPacking,name:string):Promise<void>{
-        for(let i = 0; i < binPacking.getBins().length; i++){
-            await this.writeFileRecursive(name+"/bin"+i+".svg", this.drawBin(binPacking.getBins()[i]));
+    static async drawBinPackingToFiles(binPacking: BinPacking,name:string,type: 'pdf'|'svg' = "svg"):Promise<void>{
+        for(let i = 0; i < binPacking.bins.length; i++){
+            await this.writeFileRecursive(name+"/bin"+i+".svg", this.drawBin(binPacking.bins[i],type));
         };
     }
 
 
-    private static drawBin(bin: Bin){
-        const canvas = createCanvas(bin.width, bin.height,'svg')
+    private static drawBin(bin: Bin,type: 'pdf'|'svg' = "svg"){
+        const canvas = createCanvas(bin.width, bin.height,type)
         const ctx = canvas.getContext('2d');
         function drawRec(bin: Bin){
             ctx.strokeStyle = `red`;
-            ctx.rect( bin.getX(),bin.getY(), bin.width, bin.height);
+            ctx.rect( bin.x,bin.y, bin.width, bin.height);
             ctx.stroke();
-            const item = bin.getItem()
+            const item = bin.item
             if(item != null){
-                ctx.fillStyle = item.getColor();
-                ctx.fillRect( bin.getX(),bin.getY(), item.width, item.height);
+                ctx.fillStyle = item.color;
+                ctx.fillRect( bin.x,bin.y, item.width, item.height);
                 ctx.font="20px Georgia";
                 ctx.textAlign="center"; 
                 ctx.textBaseline = "middle";
                 ctx.fillStyle = "#000000";
-                ctx.fillText(item.getId().toString(),bin.getX()+(item.width/2),bin.getY()+(item.height/2));
+                ctx.fillText(item.id.toString(),bin.x+(item.width/2),bin.y+(item.height/2));
             }
-            for(const subBin of bin.getSubBins()){
+            for(const subBin of bin.subBins){
                 drawRec(subBin);
             }
         }

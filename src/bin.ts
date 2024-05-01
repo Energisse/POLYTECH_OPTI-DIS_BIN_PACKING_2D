@@ -3,16 +3,16 @@ import Rectangle from "./rectangle";
 
 export default class Bin extends Rectangle{
 
-    private item: Item | null = null;
+    private _item: Item | null = null;
 
     private bottomSubBin : Bin | null = null;
     private rightSubBin : Bin | null = null;
 
     private divided: boolean = false;
 
-    private x: number;
+    readonly x: number;
 
-    private y: number;
+    readonly y: number;
 
     constructor(width:number, height:number, x: number = 0, y: number = 0){
         super(width, height);
@@ -26,41 +26,41 @@ export default class Bin extends Rectangle{
      */
     addItem(item:Item): boolean{
             if(item.width > this.width || item.height > this.height) return false;
-        if(item.area > this.area - (this.item?.area || 0)) return false;
+        if(item.area > this.area - (this._item?.area || 0)) return false;
 
-        if(this.item == null){
-            this.item = item;
+        if(this._item == null){
+            this._item = item;
             return true;
         } 
 
         if(this.rightSubBin==null)
-            this.rightSubBin = new Bin(this.width-this.item.width, this.height, this.x+this.item.width, this.y);
+            this.rightSubBin = new Bin(this.width-this._item.width, this.height, this.x+this._item.width, this.y);
     
         if(this.bottomSubBin==null)
-            this.bottomSubBin = new Bin(this.item.width, this.height-this.item.height, this.x, this.y + this.item.height);
+            this.bottomSubBin = new Bin(this._item.width, this.height-this._item.height, this.x, this.y + this._item.height);
 
         if(this.rightSubBin.addItem(item)) return true;
         if(this.bottomSubBin.addItem(item)) return true;
 
 
         function getDeepestY(bin: Bin): number{
-            let max = bin.y + (bin.getItem()?.height || 0);
-            for(const subBin of bin.getSubBins()){
+            let max = bin.y + (bin.item?.height || 0);
+            for(const subBin of bin.subBins){
                 max = Math.max(max, getDeepestY(subBin));
             }
             return max;
         }
 
-        const newHeight = Math.max(this.item.height, getDeepestY(this.rightSubBin));
+        const newHeight = Math.max(this._item.height, getDeepestY(this.rightSubBin));
         const newBottomBin = new Bin(this.width, this.height-newHeight, this.x, this.y+newHeight);
-        for(const item of this.bottomSubBin.getItems()){
+        for(const item of this.bottomSubBin.items){
             if(!newBottomBin.addItem(item)){
                 return false;
             }
         }
         if(newBottomBin.addItem(item)){
-            const newRightBin = new Bin(this.width-this.item.width, newHeight, this.x+this.item.width, this.y);
-            for(const item of  this.rightSubBin.getItems()){
+            const newRightBin = new Bin(this.width-this._item.width, newHeight, this.x+this._item.width, this.y);
+            for(const item of  this.rightSubBin.items){
                 if(!newRightBin.addItem(item)){
                     return false;
                 }
@@ -73,47 +73,29 @@ export default class Bin extends Rectangle{
         return false;
     }
 
-    getItem(): Item | null
-    {
-        return this.item
+    get item(): Item | null{
+        return this._item;
     }
 
-    getItems(): Array<Item>
+    get items(): Array<Item>
     {
         let items: Array<Item> = [];
-        if(this.item != null){
-            items.push(this.item);
+        if(this._item != null){
+            items.push(this._item);
         }
-        this.rightSubBin?.getItems().forEach(item => items.push(item));
-        this.bottomSubBin?.getItems().forEach(item => items.push(item));
+        this.rightSubBin?.items.forEach(item => items.push(item));
+        this.bottomSubBin?.items.forEach(item => items.push(item));
 
         return items;
     }
 
-    getSubBins(): Array<Bin>{
+    get subBins(): Array<Bin>{
         return [this.rightSubBin, this.bottomSubBin].filter(bin => bin != null) as Bin[];
-    }
-
-    removeItem(item:Item): void{
-        if(this.item?.getId() == item.getId()){
-            this.item = null;
-        }else{
-            this.rightSubBin?.removeItem(item);
-            this.bottomSubBin?.removeItem(item);
-        }
-    }
-
-    getX(): number{
-        return this.x;
-    }
-
-    getY(): number{
-        return this.y;
     }
 
     copy(): Bin{
         const bin = new Bin(this.width, this.height, this.x, this.y);
-        bin.item = this.item?.copy() || null;
+        bin._item = this._item?.copy() || null;
         bin.divided = this.divided;
         bin.bottomSubBin = this.bottomSubBin?.copy() || null;
         bin.rightSubBin = this.rightSubBin?.copy() || null;
@@ -121,7 +103,7 @@ export default class Bin extends Rectangle{
     }
 
     isEmtpy(): boolean{
-        if(this.item != null) return false;
+        if(this._item != null) return false;
         if(this.rightSubBin != null && !this.rightSubBin.isEmtpy()) return false;
         if(this.bottomSubBin != null && !this.bottomSubBin.isEmtpy()) return false;
         return true;

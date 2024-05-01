@@ -2,9 +2,9 @@ import Rectangle from "./rectangle";
 
 export default class Item extends Rectangle{
 
-    private id: number;
+    readonly id: number;
 
-    private color: string;
+    readonly color: string;
 
     constructor(id: number, width: number, height: number, color?: string) {
         super(width,height);
@@ -16,15 +16,7 @@ export default class Item extends Rectangle{
         [this.width, this.height] = [this.height, this.width];
     }
 
-    getId(): number{
-        return this.id;
-    }
-
     copy(): Item{
         return new Item(this.id, this.width, this.height, this.color);
-    }
-
-    getColor(): string{
-        return this.color;
     }
 }
