@@ -8,33 +8,39 @@ export interface GenetiqueConfig{
      * The number of iterations for the Genetique algorithm.
      * @default dataSet.items.length**2
      */
-    iteration: number;
+    iteration?: number;
+    /**
+     * The size of the population.
+     * @default 20
+     */
+    populationSize?: number;
 }
+
 
 /**
  * Represents a genetic algorithm for bin packing optimization.
  */
-class Genetique extends Metaheuristique {
-
+export default class Genetique extends Metaheuristique<GenetiqueConfig> {
     private generation: Array<BinPacking> = [];
     private newGeneration: Array<BinPacking> = [];
-    private populationSize: number = 20;
-    private iteration: number;
 
     /**
      * Creates a new instance of the Genetique class.
      * @param dataSet The dataset used for bin packing.
+     * @param config The configuration options for the Genetique algorithm.
      */
     constructor(dataSet: DataSet, config?:GenetiqueConfig) {
-        super(dataSet);
-        this.iteration = config?.iteration || dataSet.items.length**2;
+        super(dataSet, {
+            iteration: dataSet.items.length**2,
+            populationSize: 20,
+            ...config});
     }
 
     /**
      * Generates the initial population of solutions.
      */
     private generatePopulation(): void {
-        for (let i = 0; i < this.populationSize; i++) {
+        for (let i = 0; i < this.config.populationSize; i++) {
             this.generation.push(this.dataSet.createRandomSolution());
         }
     }
@@ -60,7 +66,7 @@ class Genetique extends Metaheuristique {
      */
     private crossover(): void {
         this.newGeneration = [this.generation[0]];
-        for (let i = 1; i < (this.populationSize - 1) / 2; i++) {
+        for (let i = 1; i < (this.config.populationSize - 1) / 2; i++) {
             const parent1 = this.generation[i - 1];
             const parent2 = this.generation[i];
 
@@ -99,15 +105,19 @@ class Genetique extends Metaheuristique {
             this.newGeneration[i] = new BinPacking(this.dataSet.binWidth, this.dataSet.binHeight, items);
         }
 
-        while (this.newGeneration.length < this.populationSize)
+        while (this.newGeneration.length < this.config.populationSize)
             this.newGeneration.push(this.dataSet.createRandomSolution());
 
         this.generation = this.newGeneration;
     }
 
+    /**
+     * Runs the Genetique algorithm.
+     * @returns A generator that yields the current solution and iteration number.
+     */
     public * run() {
         this.generatePopulation();
-        for (let i = 1; i <= this.iteration; i++) {
+        for (let i = 1; i <= this.config.iteration; i++) {
             this.crossover();
             this.mutate();
             this.computeFitness();
@@ -118,7 +128,6 @@ class Genetique extends Metaheuristique {
         }
     }
 
-
     /**
      * Gets the current population of bin packing solutions.
      * @returns An array of BinPacking objects representing the population.
@@ -126,6 +135,12 @@ class Genetique extends Metaheuristique {
     getPopulation(): Array<BinPacking> {
         return this.generation;
     }
-}
 
-export default Genetique;
+    /**
+     * Gets the best solution from the current population.
+     * @returns The best BinPacking solution.
+     */
+    get solution(): BinPacking {
+        return this.generation[0];
+    }
+}

@@ -2,46 +2,51 @@ import DataSet from '../dataSet';
 import BinPacking from '../binPacking';
 import Metaheuristique from './metaheuristique';
 
-class HillClimbing extends Metaheuristique{
-    private solution: BinPacking;
+export interface HillClimbingConfig{
+}
+
+export default class HillClimbing extends Metaheuristique<HillClimbingConfig>{
+    private bestSolution: BinPacking;
 
     /**
      * Creates an instance of HillClimbing.
      * @param {DataSet} dataSet - The data set for the problem.
+     * @param {HillClimbingConfig} [config] - The configuration options for the HillClimbing algorithm.
      */
-    constructor(dataSet: DataSet) {
-        super(dataSet);
-        this.solution = this.dataSet.createRandomSolution();
+    constructor(dataSet: DataSet, config?: HillClimbingConfig) {
+        super(dataSet,{
+            ...config
+        });
+        this.bestSolution = this.dataSet.createRandomSolution();
     }
 
     /**
      * Runs the HillClimbing algorithm.
      */
     public * run() {
-        let bestFitness = this.solution.fitness;
+        let bestFitness = this.bestSolution.fitness;
         let iteration = 1;
         while(true) {
             const neighbor = this.getBestNeighbors();
             if (neighbor.fitness <= bestFitness) break
-            this.solution = neighbor.solution;
+            this.bestSolution = neighbor.solution;
             bestFitness = neighbor.fitness;
             yield {
-                solution: [this.solution],
+                solution: [this.bestSolution],
                 iteration: iteration
             };
         }
     }
 
-    //TODO: merge with tabou
     /**
      * Gets the best neighbors for the HillClimbing algorithm.
-     * @returns {Object} - The best neighbors.
+     * @returns The best neighbors.
      */
     private getBestNeighbors(): {
         solution: BinPacking;
         fitness: number;
     } {
-        const items = this.solution.items;
+        const items = this.bestSolution.items;
 
         let bestSolution: BinPacking | undefined;
         let bestFitness = 0;
@@ -67,6 +72,12 @@ class HillClimbing extends Metaheuristique{
             fitness: bestFitness
         };
     }
-}
 
-export default HillClimbing;
+    /**
+     * Gets the best solution from the HillClimbing algorithm.
+     * @returns The best BinPacking solution.
+     */
+    get solution(): BinPacking {
+        return this.bestSolution;
+    }
+}

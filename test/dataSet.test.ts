@@ -4,10 +4,24 @@ import dedent from "dedent";
 import Item from '../src/Item';
 import { DataSet } from '../src';
 
+const string = dedent`
+NAME: un nom
+COMMENT: un commentaire
+NB_ITEMS: 4
+BIN_WIDTH: 250
+BIN_HEIGHT: 250
+
+ITEMS [id width height]:
+1 167 184
+2 114 118
+3 167 152
+4 69 165`
+
 describe('datSet', () => {
 
     test('from string', () => {
-        const binPacking = new DataSet("./test/test.bp2d");
+
+        const binPacking = new DataSet(string);
 
         expect(binPacking.binHeight).toEqual(250);
         expect(binPacking.binWidth).toEqual(250);
@@ -22,7 +36,7 @@ describe('datSet', () => {
     });
 
     test('getMinBinAmount', () => {
-        const binPacking = new DataSet("./test/test.bp2d");
+        const binPacking = new DataSet(string);
 
         expect(binPacking.minBinAmount).toBe(2);
     });

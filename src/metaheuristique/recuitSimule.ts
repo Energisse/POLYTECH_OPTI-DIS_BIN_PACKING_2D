@@ -2,9 +2,9 @@ import DataSet from '../dataSet';
 import BinPacking from '../binPacking';
 import Metaheuristique from './metaheuristique';
 
-export interface RecruitSimuleConfig{
+export interface RecuitSimuleConfig{
     /**
-     * The number of iterations for the RecruitSimule algorithm at each temperature.
+     * The number of iterations for the RecuitSimule algorithm at each temperature.
      * @default dataSet.items.length
      */
     iterationByTemperature?: number;
@@ -25,39 +25,41 @@ export interface RecruitSimuleConfig{
     temperature?: number;
 }
 
-class RecruitSimule extends Metaheuristique{
-    private iteration: number;
-    private iterationByTemperature: number;
-    private temperatureDecrease: number;
+export default class RecuitSimule extends Metaheuristique{
     private bestSolution: BinPacking;
     private bestFitness: number;
     private temperature: number;
 
     /**
-     * Creates an instance of RecruitSimule.
+     * Creates an instance of RecuitSimule.
      * @param {DataSet} dataSet - The data set for the problem.
+     * @param {RecuitSimuleConfig} [config] - The configuration options for the RecuitSimule algorithm.
      */
-    constructor(dataSet: DataSet,config?:RecruitSimuleConfig) {
-        super(dataSet);
+    constructor(dataSet: DataSet,config?:RecuitSimuleConfig) {
+        super(dataSet,{
+            iteration:dataSet.items.length,
+            iterationByTemperature:dataSet.items.length,
+            temperatureDecrease:0.8,
+            temperature:1,
+            ...config
+            
+        });
         this.bestSolution = this.dataSet.createRandomSolution();
         this.bestFitness = this.bestSolution.fitness;
-        this.iteration = config?.iteration || dataSet.items.length;
-        this.iterationByTemperature = config?.iterationByTemperature || dataSet.items.length;
-        this.temperatureDecrease = config?.temperatureDecrease || 0.8;
-        this.temperature = config?.temperature || 1;
+        this.temperature = this.config.temperature;
     }
     
 
     /**
-     * Runs the RecruitSimule algorithm.
+     * Runs the RecuitSimule algorithm.
      */
     public * run() {
         let currentFitness = this.bestSolution.fitness;
         let currentSolution = this.bestSolution;
 
         let totalIteration = 1;
-        for (let i = 1; i <= this.iteration; i++) {
-            for(let j = 1; j <= this.iterationByTemperature; j++){
+        for (let i = 1; i <= this.config.iteration; i++) {
+            for(let j = 1; j <= this.config.iterationByTemperature; j++){
                 const neighbor = this.getRandomNeighboor();
 
                 const fitness = neighbor.fitness;
@@ -82,12 +84,12 @@ class RecruitSimule extends Metaheuristique{
                     iteration: totalIteration
                 };
             }
-            this.temperature *= this.temperatureDecrease;
+            this.temperature *= this.config.temperatureDecrease;
         }
     }
 
     /**
-     * Gets random neighbor for the RecruitSimule algorithm.
+     * Gets random neighbor for the RecuitSimule algorithm.
      * @returns {BinPacking} - The random neighbor.
      */
     private getRandomNeighboor(): BinPacking {
@@ -105,6 +107,13 @@ class RecruitSimule extends Metaheuristique{
             return new BinPacking(this.dataSet.binWidth, this.dataSet.binHeight, neighborItems);
         }
     }
+
+    /**
+     * Gets the best solution from the HillClimbing algorithm.
+     * @returns The best BinPacking solution.
+     */
+    get solution(): BinPacking {
+        return this.bestSolution;
+    }
 }
 
-export default RecruitSimule;

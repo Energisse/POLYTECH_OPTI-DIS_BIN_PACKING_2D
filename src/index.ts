@@ -1,24 +1,28 @@
 import Metaheuristique from "./metaheuristique/metaheuristique";
-import Tabou from "./metaheuristique/tabou";
-import Genetique from "./metaheuristique/genetique";
-import RecruitSimule from "./metaheuristique/recruitSimule";
-import HillClimbing from "./metaheuristique/hillClimbing";
+import Tabou, { TabouConfig } from "./metaheuristique/tabou";
+import Genetique, { GenetiqueConfig } from "./metaheuristique/genetique";
+import RecuitSimule, { RecuitSimuleConfig } from "./metaheuristique/recuitSimule";
+import HillClimbing, { HillClimbingConfig } from "./metaheuristique/hillClimbing";
 import DataSet from "./dataSet";
 import BinPacking from "./binPacking";
-import Draw from "./draw";
 
 export {
     Metaheuristique,
 
     Tabou,
+    TabouConfig,
+
     Genetique,
-    RecruitSimule,
+    GenetiqueConfig,
+
+    RecuitSimule,
+    RecuitSimuleConfig,
+
     HillClimbing,
+    HillClimbingConfig,
 
     DataSet,
 
     BinPacking,
-
-    Draw
 };
 

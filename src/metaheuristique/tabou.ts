@@ -15,44 +15,45 @@ export interface TabouConfig{
     tabouSize?:number
 }
 
-class Tabou extends Metaheuristique{
+export default class Tabou extends Metaheuristique<TabouConfig>{
     private tabou: Array<{ src: number; dest: number }> = [];
-    private tabouSize: number;
-    private iteration: number;
-    private solution: BinPacking;
+    private bestSolution: BinPacking;
 
     /**
      * Creates an instance of Tabu.
      * @param {DataSet} dataSet - The data set for the problem.
+     * @param {TabouConfig} [config] - The configuration options for the Tabou algorithm.
      */
     constructor(dataSet: DataSet,config?:TabouConfig) {
-        super(dataSet);
-        this.solution = this.dataSet.createRandomSolution();
+        super(dataSet,{
+            iteration:dataSet.items.length**2,
+            tabouSize:dataSet.items.length/2,
+            ...config
+        });
+        this.bestSolution = this.dataSet.createRandomSolution();
         this.tabou = [];
-        this.iteration = config?.iteration || dataSet.items.length**2;
-        this.tabouSize = config?.tabouSize || dataSet.items.length/2;
     }
 
     /**
      * Runs the Tabu algorithm.
      */
     public * run() {
-        let bestFitness = this.solution.fitness;
+        let bestFitness = this.bestSolution.fitness;
 
-        for (let i = 1; i <= this.iteration; i++) {
+        for (let i = 1; i <= this.config.iteration; i++) {
             const neighbor = this.getBestNeighbors();
 
             if (neighbor.fitness <= bestFitness) {
                 this.tabou.push({ src: neighbor.src, dest: neighbor.dest });
-                if (this.tabou.length > this.tabouSize) {
+                if (this.tabou.length > this.config.tabouSize) {
                     this.tabou.shift();
                 }
             }
 
-            this.solution = neighbor.solution;
+            this.bestSolution = neighbor.solution;
             bestFitness = neighbor.fitness;
             yield {
-                solution:[this.solution],
+                solution:[this.bestSolution],
                 iteration: i
             };
         }
@@ -68,7 +69,7 @@ class Tabou extends Metaheuristique{
         solution: BinPacking;
         fitness: number;
     } {
-        const items = this.solution.items;
+        const items = this.bestSolution.items;
 
         let src = 0;
         let dest = 0;
@@ -103,6 +104,12 @@ class Tabou extends Metaheuristique{
             fitness: bestFitness
         };
     }
-}
 
-export default Tabou;
+    /**
+     * Gets the best solution from the HillClimbing algorithm.
+     * @returns The best BinPacking solution.
+     */
+    get solution(): BinPacking {
+        return this.bestSolution;
+    }
+}

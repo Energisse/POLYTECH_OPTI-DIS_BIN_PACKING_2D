@@ -1,6 +1,5 @@
 import Item from "./Item";
 import BinPacking from "./binPacking";
-import fs from 'fs';
 
 /**
  * Class representing a dataset for the bin packing problem.
@@ -12,18 +11,25 @@ export default class DataSet {
     readonly binWidth: number;
     readonly binHeight: number;
     readonly items: Array<Item>;
-    readonly file: string;
 
     /**
      * Creates a new instance of DataSet.
-     * @param file Path to the file containing the dataset.
+     * @param content : raw conten
+     * exemple :
+     * Name: test
+     * Comment: test
+     * NbItems: 3
+     * BinWidth: 250
+     * BinHeight: 250*
+     * 
+     * Items [id width height]:
+     * 1 167 184
+     * 2 114 118
+     * 3 167 152
      */
-    constructor(file: string) {
-        this.file = file;
+    constructor(content: string) {
 
-        // Read file data and initialize class properties
-        const data =  fs.readFileSync(file, 'utf-8');
-        const [name, comment, nbItems, binWidth, binHeight,,,...stringItems] = data.replace(/[^:|\n]*: /g,"").replace(/\r/g,"").split("\n");
+        const [name, comment, nbItems, binWidth, binHeight,,,...stringItems] = content.replace(/[^:|\n]*: /g,"").replace(/\r/g,"").split("\n");
         this.name = name;
         this.comment = comment;
         this.nbItems = +nbItems;

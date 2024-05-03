@@ -5,7 +5,7 @@ import DataSet from "./dataSet";
 import Tabou from "./metaheuristique/tabou";
 
 export interface WorkerData {
-    fileName: string;
+    data: string;
     type:"genetique"|"tabou";
 }
 
@@ -13,7 +13,7 @@ const data = workerData as WorkerData;
 
 const Algo = data.type == "genetique" ? Genetique : Tabou;
 
-const metaheuristique:Metaheuristique = new Algo(new DataSet(data.fileName));
+const metaheuristique:Metaheuristique = new Algo(new DataSet(data.data));
 
 const gen = metaheuristique.run();
 

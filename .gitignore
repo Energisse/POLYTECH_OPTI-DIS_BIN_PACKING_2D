@@ -133,6 +133,4 @@ dist
 output/*
 
 # build directory
-build/*
-
-# Ignore 
+dist/*
