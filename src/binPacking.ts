@@ -7,6 +7,8 @@ export default class BinPacking{
     readonly binHeight: number;
 
     readonly bins: Array<Bin> = [];
+
+    private _items: Array<Item> = [];
     
     constructor(binWidth: number, binHeight: number, items: Array<Item>) {
         this.binWidth = binWidth;
@@ -21,14 +23,15 @@ export default class BinPacking{
             bin.addItem(item);
             this.bins.push(bin);
         })
+        this._items = items;
     }    
 
 
     get items(): Array<Item>{
-        return this.bins.reduce((acc, bin) => acc.concat(bin.items), [] as Array<Item>);
+        return this._items;
     }
 
     get fitness(): number{
-        return this.bins.reduce((acc, bin) => acc + Math.pow(bin.items.reduce((acc, item) => acc + item.area, 0), 2), 0);
+        return this.bins.reduce((acc, bin) => acc + Math.pow(bin.fitness, 2), 0);
     }
 }

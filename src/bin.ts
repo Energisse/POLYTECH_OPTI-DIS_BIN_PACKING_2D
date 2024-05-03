@@ -5,6 +5,9 @@ export default class Bin extends Rectangle{
 
     private _item: Item | null = null;
 
+    private _items : Array<Item> = [];
+    private _fitness: number = 0;
+
     private bottomSubBin : Bin | null = null;
     private rightSubBin : Bin | null = null;
 
@@ -25,68 +28,74 @@ export default class Bin extends Rectangle{
      * @param item the item to add
      */
     addItem(item:Item): boolean{
+
+        const result = (()=>{
             if(item.width > this.width || item.height > this.height) return false;
-        if(item.area > this.area - (this._item?.area || 0)) return false;
+            if(item.area > this.area - (this._item?.area || 0)) return false;
 
-        if(this._item == null){
-            this._item = item;
-            return true;
-        } 
+            if(this._item == null){
+                this._item = item;
+                return true;
+            } 
 
-        if(this.rightSubBin==null)
-            this.rightSubBin = new Bin(this.width-this._item.width, this.height, this.x+this._item.width, this.y);
-    
-        if(this.bottomSubBin==null)
-            this.bottomSubBin = new Bin(this._item.width, this.height-this._item.height, this.x, this.y + this._item.height);
+            if(this.rightSubBin==null)
+                this.rightSubBin = new Bin(this.width-this._item.width, this.height, this.x+this._item.width, this.y);
+        
+            if(this.bottomSubBin==null)
+                this.bottomSubBin = new Bin(this._item.width, this.height-this._item.height, this.x, this.y + this._item.height);
 
-        if(this.rightSubBin.addItem(item)) return true;
-        if(this.bottomSubBin.addItem(item)) return true;
+            if(this.rightSubBin.addItem(item)) return true;
+            if(this.bottomSubBin.addItem(item)) return true;
 
 
-        function getDeepestY(bin: Bin): number{
-            let max = bin.y + (bin.item?.height || 0);
-            for(const subBin of bin.subBins){
-                max = Math.max(max, getDeepestY(subBin));
+            function getDeepestY(bin: Bin): number{
+                let max = bin.y + (bin.item?.height || 0);
+                for(const subBin of bin.subBins){
+                    max = Math.max(max, getDeepestY(subBin));
+                }
+                return max;
             }
-            return max;
-        }
 
-        const newHeight = Math.max(this._item.height, getDeepestY(this.rightSubBin));
-        const newBottomBin = new Bin(this.width, this.height-newHeight, this.x, this.y+newHeight);
-        for(const item of this.bottomSubBin.items){
-            if(!newBottomBin.addItem(item)){
-                return false;
-            }
-        }
-        if(newBottomBin.addItem(item)){
-            const newRightBin = new Bin(this.width-this._item.width, newHeight, this.x+this._item.width, this.y);
-            for(const item of  this.rightSubBin.items){
-                if(!newRightBin.addItem(item)){
+            const newHeight = Math.max(this._item.height, getDeepestY(this.rightSubBin));
+            const newBottomBin = new Bin(this.width, this.height-newHeight, this.x, this.y+newHeight);
+            for(const item of this.bottomSubBin.items){
+                if(!newBottomBin.addItem(item)){
                     return false;
                 }
             }
-            this.bottomSubBin = newBottomBin;
-            this.rightSubBin = newRightBin;
-            return true;
+            if(newBottomBin.addItem(item)){
+                const newRightBin = new Bin(this.width-this._item.width, newHeight, this.x+this._item.width, this.y);
+                for(const item of  this.rightSubBin.items){
+                    if(!newRightBin.addItem(item)){
+                        return false;
+                    }
+                }
+                this.bottomSubBin = newBottomBin;
+                this.rightSubBin = newRightBin;
+                return true;
+            }
+
+            return false;
+        })();
+        if(result){
+            this._items.push(item);
+            this._fitness += item.area;
         }
 
-        return false;
+        return result;
     }
 
     get item(): Item | null{
         return this._item;
     }
 
+    get fitness(): number{
+        return this._fitness;
+    }
+
     get items(): Array<Item>
     {
-        let items: Array<Item> = [];
-        if(this._item != null){
-            items.push(this._item);
-        }
-        this.rightSubBin?.items.forEach(item => items.push(item));
-        this.bottomSubBin?.items.forEach(item => items.push(item));
-
-        return items;
+        return this._items;
     }
 
     get subBins(): Array<Bin>{
