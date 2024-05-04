@@ -29,10 +29,10 @@ describe('datSet', () => {
         expect(binPacking.name).toEqual("un nom");
 
         expect(binPacking.items).toHaveLength(4);
-        expect(binPacking.items[0]).toEqual(new Item(1,167,184,binPacking.items[0].color));
-        expect(binPacking.items[1]).toEqual(new Item(2,114,118,binPacking.items[1].color));
-        expect(binPacking.items[2]).toEqual(new Item(3,167,152,binPacking.items[2].color));
-        expect(binPacking.items[3]).toEqual(new Item(4,69,165,binPacking.items[3].color));
+        expect(binPacking.items[0]).toEqual(new Item(1,167,184));
+        expect(binPacking.items[1]).toEqual(new Item(2,114,118));
+        expect(binPacking.items[2]).toEqual(new Item(3,167,152));
+        expect(binPacking.items[3]).toEqual(new Item(4,69,165));
     });
 
     test('getMinBinAmount', () => {

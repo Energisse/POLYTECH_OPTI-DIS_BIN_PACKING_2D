@@ -25,7 +25,7 @@ export interface RecuitSimuleConfig{
     temperature?: number;
 }
 
-export default class RecuitSimule extends Metaheuristique{
+export default class RecuitSimule extends Metaheuristique<RecuitSimuleConfig>{
     private bestSolution: BinPacking;
     private bestFitness: number;
     private temperature: number;
