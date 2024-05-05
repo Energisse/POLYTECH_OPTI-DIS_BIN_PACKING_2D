@@ -40,7 +40,7 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
      * Generates the initial population of solutions.
      */
     private generatePopulation(): void {
-        for (let i = 0; i < this.config.populationSize; i++) {
+        while (this.generation.length < this.config.populationSize) {
             this.generation.push(this.dataSet.createRandomSolution());
         }
     }
@@ -105,9 +105,6 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
             this.newGeneration[i] = new BinPacking(this.dataSet.binWidth, this.dataSet.binHeight, items);
         }
 
-        while (this.newGeneration.length < this.config.populationSize)
-            this.newGeneration.push(this.dataSet.createRandomSolution());
-
         this.generation = this.newGeneration;
     }
 
@@ -116,11 +113,11 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
      * @returns A generator that yields the current solution and iteration number.
      */
     public * run() {
-        this.generatePopulation();
         for (let i = 1; i <= this.config.iteration; i++) {
+            this.generatePopulation();
+            this.computeFitness();
             this.crossover();
             this.mutate();
-            this.computeFitness();
             yield {
                 solution: this.generation,
                 iteration: i
