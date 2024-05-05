@@ -1,6 +1,6 @@
 {
   "name": "polytech_opti-dis_bin_packing_2d",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "This is a 2D bin packing algorithm that uses the Optimal Discrete Bin Packing algorithm to pack rectangles into bins.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
