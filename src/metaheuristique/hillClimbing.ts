@@ -33,7 +33,7 @@ export default class HillClimbing extends Metaheuristique<HillClimbingConfig>{
             bestFitness = neighbor.fitness;
             yield {
                 solution: [this.bestSolution],
-                iteration: iteration
+                iteration: iteration++
             };
         }
     }
