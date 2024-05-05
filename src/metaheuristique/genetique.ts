@@ -80,7 +80,7 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
             const end = Math.max(index1, index2);
             const delta = end - start;
 
-            const removed = items1.slice(start, delta);
+            const removed = items1.slice(start, delta).map(item => item.copy());
             const filtered = items2.filter(item => !removed.find(({id})=>id===item.id));    
             filtered.splice(start, 0, ...removed);
             this.newGeneration.push(new BinPacking(this.dataSet.binWidth, this.dataSet.binHeight, filtered));
