@@ -2,29 +2,30 @@ import BinPacking from "../binPacking";
 import DataSet from "../dataSet";
 
 abstract class Metaheuristique<T = any>{
-    private _dataSet: DataSet;
+    readonly dataSet: DataSet;
     private _config: Required<T>;
+    readonly generator: Generator<{
+        solution: BinPacking[];
+        iteration: number;
+    }, void, void>;
 
     constructor(dataSet: DataSet, config: Required<T>) {
-        this._dataSet = dataSet;
+        this.dataSet = dataSet;
         this._config = config;
+        this.generator = this.initGenerator();
     }
 
-    /**
-     * Runs the algorithm.
-     * @returns The generator.
-     */
-    public abstract run(): Generator<{
+    protected abstract initGenerator(): Generator<{
         solution: BinPacking[];
         iteration: number;
     }, void, void>;
 
     /**
-     * The data set for the problem.
-     * @returns The data set.
+     * Runs the algorithm.
+     * @returns The generator.
      */
-    get dataSet(): DataSet{
-        return this._dataSet;
+     public run() {
+        return this.generator.next();
     }
 
     /**
@@ -67,6 +68,7 @@ abstract class Metaheuristique<T = any>{
     get fitness():number{
         return this.solution.fitness;
     }
+
 }
 
 export default Metaheuristique;

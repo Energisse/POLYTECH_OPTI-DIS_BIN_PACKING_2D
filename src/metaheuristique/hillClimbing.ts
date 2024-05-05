@@ -21,9 +21,10 @@ export default class HillClimbing extends Metaheuristique<HillClimbingConfig>{
     }
 
     /**
-     * Runs the HillClimbing algorithm.
+     * Initializes the generator for the Genetique algorithm.
+     * @returns A generator that yields the current solution and iteration number.
      */
-    public * run() {
+    protected * initGenerator(){
         let bestFitness = this.bestSolution.fitness;
         let iteration = 1;
         while(true) {

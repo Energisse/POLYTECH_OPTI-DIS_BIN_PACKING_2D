@@ -109,10 +109,10 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
     }
 
     /**
-     * Runs the Genetique algorithm.
+     * Initializes the generator for the Genetique algorithm.
      * @returns A generator that yields the current solution and iteration number.
      */
-    public * run() {
+    protected * initGenerator(){
         for (let i = 1; i <= this.config.iteration; i++) {
             this.generatePopulation();
             this.computeFitness();

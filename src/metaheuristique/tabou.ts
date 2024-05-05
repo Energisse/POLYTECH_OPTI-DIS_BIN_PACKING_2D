@@ -35,9 +35,10 @@ export default class Tabou extends Metaheuristique<TabouConfig>{
     }
 
     /**
-     * Runs the Tabu algorithm.
+     * Initializes the generator for the Genetique algorithm.
+     * @returns A generator that yields the current solution and iteration number.
      */
-    public * run() {
+    protected * initGenerator(){
         let bestFitness = this.bestSolution.fitness;
 
         for (let i = 1; i <= this.config.iteration; i++) {

@@ -81,12 +81,11 @@ for(const data of dataSet){
     for(const algo of algos){
         console.log(chalk.blueBright.underline(`\t${algo.constructor.name}`));
         const start = performance.now();
-        const gen = algo.run();
-        let value = gen.next();
+        let value = algo.run();
         while(value.done == false){
             const {solution,iteration} = value.value;
             if(iteration%data.nbItems == 0 ||iteration == 1)Draw.drawBinPackingToFilesSync(solution[0], `./output/${algo.constructor.name.toLowerCase()}/${data.name}/${iteration}`);
-            value = gen.next();
+            value = algo.run();
         }
         console.log(chalk(`\tResolved with ${algo.numberOfBins} bins (fitness: ${algo.fitness})`));
         console.log(chalk(`\tdone in ${Math.floor(performance.now() - start)}ms \n`));

@@ -51,9 +51,10 @@ export default class RecuitSimule extends Metaheuristique<RecuitSimuleConfig>{
     
 
     /**
-     * Runs the RecuitSimule algorithm.
+     * Initializes the generator for the Genetique algorithm.
+     * @returns A generator that yields the current solution and iteration number.
      */
-    public * run() {
+    protected * initGenerator(){
         let currentFitness = this.bestSolution.fitness;
         let currentSolution = this.bestSolution;
 
