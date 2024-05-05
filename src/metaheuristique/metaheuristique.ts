@@ -1,7 +1,10 @@
 import BinPacking from "../binPacking";
 import DataSet from "../dataSet";
 
-abstract class Metaheuristique<T = any>{
+abstract class Metaheuristique<T = any> implements Iterable<{
+    solution: BinPacking[];
+    iteration: number;
+}>{   
     readonly dataSet: DataSet;
     private _config: Required<T>;
     readonly generator: Generator<{
@@ -26,6 +29,14 @@ abstract class Metaheuristique<T = any>{
      */
      public run() {
         return this.generator.next();
+    }
+
+    /**
+     * The iterator for the algorithm.
+     * @returns The iterator.
+     */
+    [Symbol.iterator](): Iterator<{ solution: BinPacking[]; iteration: number; }, any, undefined> {
+        return this.generator;
     }
 
     /**

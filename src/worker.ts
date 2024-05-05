@@ -15,13 +15,9 @@ const Algo = data.type == "genetique" ? Genetique : Tabou;
 
 const metaheuristique:Metaheuristique = new Algo(new DataSet(data.data));
 
-let value = metaheuristique.run();
-
 parentPort?.once('message', async () => {
-    while(value.done == false){
-        const {solution,iteration} = value.value;
+    for(const {solution,iteration} of metaheuristique){
         parentPort?.postMessage({fitness:solution[0].fitness,i:iteration});
-        value = metaheuristique.run();
     }
 })
 

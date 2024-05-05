@@ -66,7 +66,7 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
      */
     private crossover(): void {
         this.newGeneration = [this.generation[0]];
-        for (let i = 1; i < (this.config.populationSize - 1) / 2; i++) {
+        for (let i = 1; i < this.config.populationSize / 2; i++) {
             const parent1 = this.generation[i - 1];
             const parent2 = this.generation[i];
 
@@ -80,10 +80,11 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
             const end = Math.max(index1, index2);
             const delta = end - start;
 
-            const removed = items1.splice(start, delta);
-            items1.push(...items2.filter(item => removed.includes(item)));
+            const removed = items1.slice(start, delta);
+            const filtered = items2.filter(item => !removed.includes(item))
+            filtered.splice(start, 0, ...removed);
             this.newGeneration.push(new BinPacking(this.dataSet.binWidth, this.dataSet.binHeight, items1));
-        }
+        }   
     }
 
     /**
@@ -104,8 +105,6 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
 
             this.newGeneration[i] = new BinPacking(this.dataSet.binWidth, this.dataSet.binHeight, items);
         }
-
-        this.generation = this.newGeneration;
     }
 
     /**
@@ -114,10 +113,12 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
      */
     protected * initGenerator(){
         for (let i = 1; i <= this.config.iteration; i++) {
-            this.generatePopulation();
+            this.generatePopulation(); // Generate population if this population size changes by the config while running
             this.computeFitness();
             this.crossover();
             this.mutate();
+            this.generation = this.newGeneration;
+            this.generatePopulation();
             yield {
                 solution: this.generation,
                 iteration: i
