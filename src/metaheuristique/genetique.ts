@@ -1,9 +1,9 @@
 import BinPacking from "../binPacking";
 import DataSet from "../dataSet";
-import Metaheuristique from "./metaheuristique";
+import Metaheuristique, { MetaheuristiqueConfig } from "./metaheuristique";
 
 
-export interface GenetiqueConfig{
+export type GenetiqueConfig = {
     /**
      * The number of iterations for the Genetique algorithm.
      * @default dataSet.items.length**2
@@ -14,7 +14,7 @@ export interface GenetiqueConfig{
      * @default 20
      */
     populationSize?: number;
-}
+} & MetaheuristiqueConfig
 
 
 /**
@@ -29,11 +29,13 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
      * @param dataSet The dataset used for bin packing.
      * @param config The configuration options for the Genetique algorithm.
      */
-    constructor(dataSet: DataSet, config?:GenetiqueConfig) {
+    constructor(dataSet: DataSet, config?: GenetiqueConfig) {
         super(dataSet, {
-            iteration: dataSet.items.length**2,
+            convergence: 10,
+            iteration: dataSet.items.length ** 2,
             populationSize: 20,
-            ...config});
+            ...config
+        });
     }
 
     /**
@@ -81,10 +83,10 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
             const delta = end - start;
 
             const removed = items1.slice(start, delta).map(item => item.copy());
-            const filtered = items2.filter(item => !removed.find(({id})=>id===item.id));    
+            const filtered = items2.filter(item => !removed.find(({ id }) => id === item.id));
             filtered.splice(start, 0, ...removed);
             this.newGeneration.push(new BinPacking(this.dataSet.binWidth, this.dataSet.binHeight, filtered));
-        }   
+        }
     }
 
     /**
@@ -111,7 +113,7 @@ export default class Genetique extends Metaheuristique<GenetiqueConfig> {
      * Initializes the generator for the Genetique algorithm.
      * @returns A generator that yields the current solution and iteration number.
      */
-    protected * initGenerator(){
+    protected * initGenerator() {
         for (let i = 1; i <= this.config.iteration; i++) {
             this.generatePopulation(); // Generate population if this population size changes by the config while running
             this.computeFitness();

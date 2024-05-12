@@ -1,11 +1,11 @@
 import DataSet from '../dataSet';
 import BinPacking from '../binPacking';
-import Metaheuristique from './metaheuristique';
+import Metaheuristique, { MetaheuristiqueConfig } from './metaheuristique';
 
-export interface HillClimbingConfig{
-}
+export type HillClimbingConfig = {
+} & Omit<MetaheuristiqueConfig, 'convergence'>;
 
-export default class HillClimbing extends Metaheuristique<HillClimbingConfig>{
+export default class HillClimbing extends Metaheuristique<HillClimbingConfig> {
     private bestSolution: BinPacking;
 
     /**
@@ -14,7 +14,8 @@ export default class HillClimbing extends Metaheuristique<HillClimbingConfig>{
      * @param {HillClimbingConfig} [config] - The configuration options for the HillClimbing algorithm.
      */
     constructor(dataSet: DataSet, config?: HillClimbingConfig) {
-        super(dataSet,{
+        super(dataSet, {
+            convergence: 0,
             ...config
         });
         this.bestSolution = this.dataSet.createRandomSolution();
@@ -24,10 +25,10 @@ export default class HillClimbing extends Metaheuristique<HillClimbingConfig>{
      * Initializes the generator for the Genetique algorithm.
      * @returns A generator that yields the current solution and iteration number.
      */
-    protected * initGenerator(){
+    protected * initGenerator() {
         let bestFitness = this.bestSolution.fitness;
         let iteration = 1;
-        while(true) {
+        while (true) {
             const neighbor = this.getBestNeighbors();
             if (neighbor.fitness <= bestFitness) break
             this.bestSolution = neighbor.solution;

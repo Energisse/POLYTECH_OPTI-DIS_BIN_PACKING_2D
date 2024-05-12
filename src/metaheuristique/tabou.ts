@@ -1,8 +1,8 @@
 import DataSet from '../dataSet';
 import BinPacking from '../binPacking';
-import Metaheuristique from './metaheuristique';
+import Metaheuristique, { MetaheuristiqueConfig } from './metaheuristique';
 
-export interface TabouConfig{
+export type TabouConfig = {
     /**
      * The number of iterations for the Tabou algorithm.
      * @default dataSet.items.length**2
@@ -12,10 +12,10 @@ export interface TabouConfig{
      * The size of the tabou list.
      * @default dataSet.items.length/2
      */
-    tabouSize?:number
-}
+    tabouSize?: number
+} & MetaheuristiqueConfig
 
-export default class Tabou extends Metaheuristique<TabouConfig>{
+export default class Tabou extends Metaheuristique<TabouConfig> {
     private tabou: Array<{ src: number; dest: number }> = [];
     private bestSolution: BinPacking;
 
@@ -24,10 +24,11 @@ export default class Tabou extends Metaheuristique<TabouConfig>{
      * @param {DataSet} dataSet - The data set for the problem.
      * @param {TabouConfig} [config] - The configuration options for the Tabou algorithm.
      */
-    constructor(dataSet: DataSet,config?:TabouConfig) {
-        super(dataSet,{
-            iteration:dataSet.items.length**2,
-            tabouSize:dataSet.items.length/2,
+    constructor(dataSet: DataSet, config?: TabouConfig) {
+        super(dataSet, {
+            convergence: 10,
+            iteration: dataSet.items.length ** 2,
+            tabouSize: dataSet.items.length / 2,
             ...config
         });
         this.bestSolution = this.dataSet.createRandomSolution();
@@ -38,7 +39,7 @@ export default class Tabou extends Metaheuristique<TabouConfig>{
      * Initializes the generator for the Genetique algorithm.
      * @returns A generator that yields the current solution and iteration number.
      */
-    protected * initGenerator(){
+    protected * initGenerator() {
         let bestFitness = this.bestSolution.fitness;
 
         for (let i = 1; i <= this.config.iteration; i++) {
@@ -54,7 +55,7 @@ export default class Tabou extends Metaheuristique<TabouConfig>{
             this.bestSolution = neighbor.solution;
             bestFitness = neighbor.fitness;
             yield {
-                solution:[this.bestSolution],
+                solution: [this.bestSolution],
                 iteration: i
             };
         }

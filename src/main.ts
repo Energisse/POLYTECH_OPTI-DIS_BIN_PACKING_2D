@@ -8,33 +8,34 @@ import Draw from './draw';
 import HillClimbing from './metaheuristique/hillClimbing';
 import RecuitSimule from './metaheuristique/recuitSimule';
 import chalk from 'chalk';
-const binPackingFolder:string = "./binpacking2d/";
+const binPackingFolder: string = "./binpacking2d/";
 
 const folders = fs.readdirSync(binPackingFolder)
-const dataSet = folders.map(file => new DataSet(fs.readFileSync(binPackingFolder+file,"utf8")));
+const dataSet = folders.map(file => new DataSet(fs.readFileSync(binPackingFolder + file, "utf8")));
 
-function createWorker(data:string,type:"genetique"|"tabou"){
-    return new Worker(require.resolve(`./worker`), { execArgv:['-r', 'ts-node/register/transpile-only'],
-    workerData:{
-        data:data,
-        type
-    } satisfies WorkerData
-    });  
+function createWorker(data: string, type: "genetique" | "tabou") {
+    return new Worker(require.resolve(`./worker`), {
+        execArgv: ['-r', 'ts-node/register/transpile-only'],
+        workerData: {
+            data: data,
+            type
+        } satisfies WorkerData
+    });
 }
 
 
-function waitWorkerReady(worker:Worker){
+function waitWorkerReady(worker: Worker) {
     return new Promise((resolve) => {
         worker.on('message', (message) => {
-            if(message == "ready"){
+            if (message == "ready") {
                 resolve("");
             }
         });
     });
 }
 
-function waitWorkerToFinish(worker:Worker){
-    return new Promise((resolve) => worker.on('exit',resolve));
+function waitWorkerToFinish(worker: Worker) {
+    return new Promise((resolve) => worker.on('exit', resolve));
 }
 
 /*(async () => {
@@ -69,22 +70,27 @@ function waitWorkerToFinish(worker:Worker){
 try {
     fs.rmSync('./output', { recursive: true })
 }
-catch(e){
+catch (e) {
     console.log(e);
 }
 
+//Desactivation de la convergence
+const convergence = 0
+
 const gobalStart = performance.now();
-for(const data of dataSet){
+for (const data of dataSet) {
     const startDataSet = performance.now();
     console.log(chalk.greenBright.underline(`Starting ${data.name}`));
-    const algos =  [ new Genetique(data),new Tabou(data),new HillClimbing(data),new RecuitSimule(data)];
-    for(const algo of algos){
+    const algos = [new Genetique(data, { convergence }), new Tabou(data, { convergence }), new HillClimbing(data, { convergence }), new RecuitSimule(data, { convergence })];
+    for (const algo of algos) {
         console.log(chalk.blueBright.underline(`\t${algo.constructor.name}`));
         const start = performance.now();
-        for(const {iteration,solution} of algo){
-            if(iteration%data.nbItems == 0 ||iteration == 1)Draw.drawBinPackingToFilesSync(solution[0], `./output/${algo.constructor.name.toLowerCase()}/${data.name}/${iteration}`);
+        let lastIteration = 0;
+        for (const { iteration, solution } of algo) {
+            if (iteration % data.nbItems == 0 || iteration == 1) Draw.drawBinPackingToFilesSync(solution[0], `./output/${algo.constructor.name.toLowerCase()}/${data.name}/${iteration}`);
+            lastIteration = iteration;
         }
-        console.log(chalk(`\tResolved with ${algo.numberOfBins} bins (fitness: ${algo.fitness})`));
+        console.log(chalk(`\tResolved with ${algo.numberOfBins} bins (fitness: ${algo.fitness}) under ${lastIteration} iterations`));
         console.log(chalk(`\tdone in ${Math.floor(performance.now() - start)}ms \n`));
     }
     console.log(chalk.whiteBright.bgGreenBright(`${data.name} done in ${Math.floor(performance.now() - startDataSet)}ms\n`));
