@@ -75,7 +75,7 @@ catch (e) {
 }
 
 //Desactivation de la convergence
-const convergence = 0
+const convergence = 10
 
 const gobalStart = performance.now();
 for (const data of dataSet) {

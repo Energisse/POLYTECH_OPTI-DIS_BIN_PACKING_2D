@@ -21,7 +21,6 @@ abstract class Metaheuristique<T> implements Iterable<{
         iteration: number;
     }, void, void>;
     private lastFitness: number = 0;
-    private convergenceCounter: number = 0;
 
     constructor(dataSet: DataSet, config: Required<T> & Required<MetaheuristiqueConfig>) {
         this.dataSet = dataSet;
@@ -44,17 +43,18 @@ abstract class Metaheuristique<T> implements Iterable<{
 
     private * convergenceGenerator(): Generator<{ solution: BinPacking[]; iteration: number; }, void, void> {
         const generator = this.initGenerator();
+        let convergenceCounter: number = 0;
         for (const { solution, iteration } of generator) {
             if (this._config.convergence !== 0) {
                 if (this.lastFitness >= solution[0].fitness) {
-                    this.convergenceCounter++;
-                    if (this.convergenceCounter >= this._config.convergence) {
+                    convergenceCounter++;
+                    if (convergenceCounter >= this._config.convergence) {
                         generator.return();
                     }
                 }
                 else {
                     this.lastFitness = this.fitness;
-                    this.convergenceCounter = 0;
+                    convergenceCounter = 0;
                 }
             }
             yield { solution, iteration };
