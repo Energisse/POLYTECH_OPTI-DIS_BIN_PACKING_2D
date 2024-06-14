@@ -10,7 +10,7 @@ export interface MetaheuristiqueConfig {
 }
 
 
-abstract class Metaheuristique<T> implements Iterable<{
+abstract class Metaheuristique<T = any> implements Iterable<{
     solution: BinPacking[];
     iteration: number;
 }> {
